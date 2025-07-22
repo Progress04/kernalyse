@@ -1,0 +1,57 @@
+@startuml
+title kernalyse - Layered System Architecture
+
+skinparam componentStyle rectangle
+
+package "1. Instrumentation Layer" {
+  [CUDA Profiler (CUPTI/NVTX)]
+  [Triton Hook / IR Emitter]
+  [Script Runner (CLI)]
+}
+
+package "2. Processing Layer" {
+  [Trace Parser]
+  [Kernel Analyzer]
+  [Model-Aware Mapper]
+}
+
+package "3. Storage Layer" {
+  [Metrics DB (SQLite / Parquet)]
+  [Trace Artifact Store]
+}
+
+package "4. Visualization Layer" {
+  [Web UI (React + D3)]
+  [CLI Report Generator]
+}
+
+package "5. User Interface" {
+  [User]
+  [Command-line Tool (kernalyse)]
+  [REST / gRPC API]
+}
+
+' Flow arrows
+[Script Runner (CLI)] --> [CUDA Profiler (CUPTI/NVTX)]
+[Script Runner (CLI)] --> [Triton Hook / IR Emitter]
+
+[CUDA Profiler (CUPTI/NVTX)] --> [Trace Parser]
+[Triton Hook / IR Emitter] --> [Trace Parser]
+
+[Trace Parser] --> [Kernel Analyzer]
+[Kernel Analyzer] --> [Model-Aware Mapper]
+
+[Model-Aware Mapper] --> [Metrics DB (SQLite / Parquet)]
+[Trace Parser] --> [Trace Artifact Store]
+
+[Metrics DB (SQLite / Parquet)] --> [Web UI (React + D3)]
+[Trace Artifact Store] --> [Web UI (React + D3)]
+[Metrics DB (SQLite / Parquet)] --> [CLI Report Generator]
+
+[User] --> [Command-line Tool (kernalyse)]
+[Command-line Tool (kernalyse)] --> [Script Runner (CLI)]
+[Command-line Tool (kernalyse)] --> [CLI Report Generator]
+[User] --> [Web UI (React + D3)]
+[REST / gRPC API] --> [Metrics DB (SQLite / Parquet)]
+
+@enduml

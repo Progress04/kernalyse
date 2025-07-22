@@ -1,0 +1,13 @@
+[project]
+name = "kernalyse"
+version = "0.1.0"
+description = "CUDA Kernel Profiler and Visualizer"
+dependencies = [
+  "pandas",
+  "click",
+  "sqlite-utils",
+  "plotly",
+  "fastapi",
+  "uvicorn",
+  "pyparsing"
+]
