@@ -7,6 +7,7 @@ def run_nsys(target="./examples/vector_add", output="data/profile"):
         "nsys", "profile",
         "-t", "cuda",
         "-o", output,
+        "--force-overwrite","true",
         target
     ]
     print(f"Running: {' '.join(cmd)}")
