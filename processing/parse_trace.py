@@ -26,7 +26,7 @@ def extract_kernel_data(trace_file: str) -> pd.DataFrame:
             skip_next = False
             continue
         if capture and line.strip() == "":
-            break
+            break   # blank line means end of table
         if capture:
             kernel_lines.append(line.strip())
 
