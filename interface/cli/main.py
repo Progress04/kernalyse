@@ -8,7 +8,7 @@ def cli():
     pass
 
 @cli.command()
-@click.option('--target', default='multi_kernel_ops', help='Name of target executable to profile.')
+@click.option('--target', default='examples/multi_kernel', help='Target model or binary to profile.')
 def profile(target):
     run_nsys(target)
     df = extract_kernel_data("data/profile")

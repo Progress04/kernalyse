@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  kernalyse:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kernalyse-nsys
+    container_name: kernalyse
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true

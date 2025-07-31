@@ -34,13 +34,13 @@ int main() {
   int threadsPerBlock = 256;
   int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 
+  vecSquare<<<blocksPerGrid, threadsPerBlock>>>(a, b, N);
+  cudaDeviceSynchronize();
+
   vecAdd<<<blocksPerGrid, threadsPerBlock>>>(a, b, c, N);
   cudaDeviceSynchronize();
 
   vecMul<<<blocksPerGrid, threadsPerBlock>>>(a, b, c, N);
-  cudaDeviceSynchronize();
-
-  vecSquare<<<blocksPerGrid, threadsPerBlock>>>(a, b, N);
   cudaDeviceSynchronize();
 
   std::cout << "c[42] after vecMul = " << c[42] << std::endl;
