@@ -21,3 +21,18 @@ elif command -v open &> /dev/null; then
 else
     echo "📎 Please open $PLOT_PATH manually — no opener found"
 fi
+
+
+HTML_PATH="./data/kernel_plot.html"
+if [ -f "$HTML_PATH" ]; then
+    echo "📂 Opening $HTML_PATH..."
+    if command -v xdg-open > /dev/null; then
+        xdg-open "$HTML_PATH"
+    elif command -v open > /dev/null; then
+        open "$HTML_PATH"
+    else
+        echo "❌ Could not auto-open. Please open this manually: $HTML_PATH"
+    fi
+else
+    echo "❌ Plot not found at $HTML_PATH"
+fi

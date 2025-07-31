@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip3 install --upgrade pip && \
     pip3 install \
     onnx onnxruntime-gpu \
-    pandas matplotlib click transformers
+    pandas matplotlib plotly click transformers
 
 # Install Nsight Systems CLI from NVIDIA (scripted)
 RUN apt-get update && apt-get install -y cuda-nsight-systems-12-2
