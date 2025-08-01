@@ -20,7 +20,7 @@ package "3. Storage Layer" {
   [Trace Artifact Store]
 }
 
-package "4. Visualization Layer" {
+package "4. Visualisation Layer" {
   [Web UI (React + D3)]
   [CLI Report Generator]
 }

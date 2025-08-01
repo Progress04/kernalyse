@@ -1,14 +1,13 @@
 import subprocess
-import os
 
-def run_nsys(target="./examples/vector_add", output="data/profile"):
-    os.makedirs("data", exist_ok=True)
+def run_nsys(model, prompt, trace_output):
+    """Runs inference on the given model with prompt and profiles it using nsys."""
     cmd = [
         "nsys", "profile",
         "-t", "cuda",
-        "-o", output,
-        "--force-overwrite","true",
-        target
+        "-o", trace_output,
+        "--force-overwrite", "true",
+        "python3", "examples/inference_runners/run_onnx.py", model, prompt
     ]
-    print(f"Running: {' '.join(cmd)}")
+    print(f"[nsys] Running: {' '.join(cmd)}")
     subprocess.run(cmd, check=True)

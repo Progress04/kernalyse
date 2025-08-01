@@ -1,7 +1,7 @@
 [project]
 name = "kernalyse"
 version = "0.1.0"
-description = "CUDA Kernel Profiler and Visualizer"
+description = "CUDA Kernel Profiler and Visualiser"
 dependencies = [
   "pandas",
   "click",
