@@ -57,7 +57,7 @@ The system architecture is organized into five layers:
 
 3. Download the ONNX BERT model:
    ```bash
-   python3 -m transformers.onnx --model=bert-base-cased --feature=sequence-classification onnx-models/bert
+   python3 -m transformers.onnx --model=bert-base-cased --feature=sequence-classification examples/bert/
    ```
 
 ## Usage
