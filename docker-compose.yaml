@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   kernalyse:
     build:
@@ -10,8 +8,11 @@ services:
     runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
+    ports:
+      - "5000:5000"
     volumes:
       - .:/workspace
     working_dir: /workspace
     stdin_open: true
     tty: true
+    command: python3 app/app.py

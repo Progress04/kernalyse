@@ -1,25 +1,26 @@
-import onnxruntime as ort
-import numpy as np
 import sys
+import onnxruntime as ort
+from transformers import BertTokenizer
+import numpy as np
 
-def run(model_path):
-    print(f"[INFO] Loading model: {model_path}")
-    print("[INFO] Available providers:", ort.get_available_providers())
+if len(sys.argv) < 3:
+    print("Usage: run_onnx.py <model_path> <prompt>")
+    sys.exit(1)
 
-    session = ort.InferenceSession(model_path, providers=["CUDAExecutionProvider"])
-    print("[INFO] Using provider:", session.get_providers())
+model_path = sys.argv[1]
+text = sys.argv[2]
 
-    # Dummy input for BERT-like model
-    inputs = {
-        "input_ids": np.ones((1, 16), dtype=np.int64),
-        "attention_mask": np.ones((1, 16), dtype=np.int64),
-    }
-    
-    inputs["token_type_ids"] = np.zeros_like(inputs["input_ids"])
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+session = ort.InferenceSession(model_path, providers=["CUDAExecutionProvider"])
 
-    print("[INFO] Running inference...")
-    outputs = session.run(None, inputs)
-    print("[INFO] Output shape:", outputs[0].shape)
+inputs = tokenizer(text, return_tensors="np", padding="max_length", truncation=True, max_length=128)
 
-if __name__ == "__main__":
-    run(sys.argv[1])
+onnx_inputs = {
+    "input_ids": inputs["input_ids"],
+    "attention_mask": inputs["attention_mask"],
+    "token_type_ids": inputs.get("token_type_ids", np.zeros_like(inputs["input_ids"]))
+}
+
+print(f"[INFO] Running inference on: {text}")
+outputs = session.run(None, onnx_inputs)
+print(f"[INFO] Output shape: {outputs[0].shape}")
