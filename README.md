@@ -130,3 +130,6 @@ Example for a custom CUDA binary:
 ## License
 
 This project is licensed under the terms of the NVIDIA Deep Learning Container License.
+
+
+python3 -m interface.cli.main profile --prompt "sample text" --model examples/bert/model.onnx
