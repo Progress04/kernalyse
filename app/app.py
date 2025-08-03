@@ -29,7 +29,6 @@ def index():
             f"--trace-output data/profile"
         ]
 
-
         print("Running Docker command:")
         print(" ".join(container_cmd))
 
@@ -49,8 +48,14 @@ def index():
 
 @app.route("/plot")
 def show_plot():
+    plot_type = request.args.get("type", "bar")
+    if plot_type == "gantt":
+        path = os.path.join("data", "kernel_timeline.html")
+    else:
+        path = os.path.join("data", "kernel_plot.html")
+
     try:
-        with open(PLOT_PATH, "r") as f:
+        with open(path, "r") as f:
             return f.read()
     except Exception as e:
         return f"<h3>❌ Failed to load plot</h3><pre>{e}</pre>"

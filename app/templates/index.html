@@ -1,18 +1,52 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Kernalyse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Kernalyse: Profile Your Model</h1>
-    <form method="post">
-    <textarea name="user_input" rows="4" cols="50" placeholder="e.g. bert"></textarea><br>
-    <button type="submit">Kernalyse</button>
-    </form>
+<body class="bg-gray-100 text-gray-900">
+    <div class="max-w-4xl mx-auto py-10 px-6">
+        <h1 class="text-4xl font-bold mb-6">🚀 Kernalyse: Profile Your Model</h1>
 
-    {% if plot_exists %}
-    <h2>CUDA Kernel Visualization:</h2>
-    <iframe src="/plot" width="100%" height="600"></iframe>
-    {% endif %}
+        <form method="post" class="mb-8 space-y-4">
+            <textarea name="user_input" rows="4" class="w-full p-4 border border-gray-300 rounded shadow" placeholder="e.g. bert">{{ request.form.user_input or "" }}</textarea>
+            <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow">Kernalyse</button>
+        </form>
+
+        <script>
+        document.querySelector("form").addEventListener("submit", () => {
+            const btn = document.querySelector("button[type=submit]");
+            btn.disabled = true;
+            btn.textContent = "Profiling...";
+        });
+        </script>
+
+
+        {% if plot_exists %}
+            <h2 class="text-2xl font-semibold mb-4">🎯 CUDA Kernel Visualization</h2>
+            <div class="border rounded shadow overflow-hidden">
+                <div class="mb-4">
+                <button onclick="showPlot('bar')" class="px-4 py-2 bg-blue-600 text-white rounded">Bar Chart</button>
+                <button onclick="showPlot('gantt')" class="px-4 py-2 bg-gray-600 text-white rounded">Gantt Chart</button>
+                </div>
+
+                <!-- Update iframe logic -->
+                <div id="bar-chart-frame" style="display: block;">
+                <iframe src="/plot?type=bar" class="w-full h-[600px] border-0"></iframe>
+                </div>
+                <div id="gantt-chart-frame" style="display: none;">
+                <iframe src="/plot?type=gantt" class="w-full h-[600px] border-0"></iframe>
+                </div>
+
+                <script>
+                function showPlot(type) {
+                document.getElementById('bar-chart-frame').style.display = type === 'bar' ? 'block' : 'none';
+                document.getElementById('gantt-chart-frame').style.display = type === 'gantt' ? 'block' : 'none';
+                }
+                </script>
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>

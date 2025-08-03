@@ -6,6 +6,7 @@ def run_nsys(model, prompt, trace_output):
         "nsys", "profile",
         "-t", "cuda",
         "-o", trace_output,
+        "--stats", "true",
         "--force-overwrite", "true",
         "python3", "examples/inference_runners/run_onnx.py", model, prompt
     ]

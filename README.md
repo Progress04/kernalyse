@@ -57,7 +57,7 @@ The system architecture is organized into five layers:
 
 3. Download the ONNX BERT model:
    ```bash
-   python3 -m transformers.onnx --model=bert-base-cased --feature=sequence-classification onnx-models/bert
+   python3 -m transformers.onnx --model=bert-base-cased --feature=sequence-classification examples/bert/
    ```
 
 ## Usage
@@ -130,3 +130,6 @@ Example for a custom CUDA binary:
 ## License
 
 This project is licensed under the terms of the NVIDIA Deep Learning Container License.
+
+
+python3 -m interface.cli.main profile --prompt "sample text" --model examples/bert/model.onnx
