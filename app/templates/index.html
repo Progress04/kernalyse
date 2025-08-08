@@ -10,11 +10,42 @@
         <h1 class="text-4xl font-bold mb-6">🚀 Kernalyse: Profile Your Model</h1>
 
         <form method="post" class="mb-8 space-y-4">
-            <textarea name="user_input" rows="4" class="w-full p-4 border border-gray-300 rounded shadow" placeholder="e.g. bert">{{ request.form.user_input or "" }}</textarea>
+            <label for="model_choice" class="block font-semibold">Select Model or Kernel</label>
+            <select name="model_choice" id="model_choice"
+                    class="w-full p-4 border border-gray-300 rounded shadow"
+                    onchange="updatePromptVisibility(this.value)">
+                {% for name, config in model_registry.items() %}
+                    <option value="{{ name }}" {% if selected_model == name %}selected{% endif %}>
+                        {{ name }} ({{ config.type }})
+                    </option>
+                {% endfor %}
+            </select>
+
+            <div id="prompt-input" style="display: none;">
+                <textarea name="user_input" rows="4" class="w-full p-4 border border-gray-300 rounded shadow" placeholder="Enter prompt for LLM">{{ user_input }}</textarea>
+            </div>
+
             <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 shadow">Kernalyse</button>
         </form>
 
         <script>
+        const modelRegistry = {{ model_registry | tojson }};
+        function updatePromptVisibility(modelKey) {
+            const type = modelRegistry[modelKey]?.type;
+            const promptInput = document.getElementById("prompt-input");
+            if (type === "onnx") {
+                promptInput.style.display = "block";
+            } else {
+                promptInput.style.display = "none";
+            }
+        }
+
+        // Trigger visibility on load
+        window.onload = () => {
+            const selected = document.getElementById("model_choice").value;
+            updatePromptVisibility(selected);
+        }
+
         document.querySelector("form").addEventListener("submit", () => {
             const btn = document.querySelector("button[type=submit]");
             btn.disabled = true;
@@ -22,27 +53,24 @@
         });
         </script>
 
-
         {% if plot_exists %}
             <h2 class="text-2xl font-semibold mb-4">🎯 CUDA Kernel Visualization</h2>
             <div class="border rounded shadow overflow-hidden">
                 <div class="mb-4">
-                <button onclick="showPlot('bar')" class="px-4 py-2 bg-blue-600 text-white rounded">Bar Chart</button>
-                <button onclick="showPlot('gantt')" class="px-4 py-2 bg-gray-600 text-white rounded">Gantt Chart</button>
+                    <button onclick="showPlot('bar')" class="px-4 py-2 bg-blue-600 text-white rounded">Bar Chart</button>
+                    <button onclick="showPlot('gantt')" class="px-4 py-2 bg-gray-600 text-white rounded">Gantt Chart</button>
                 </div>
-
-                <!-- Update iframe logic -->
                 <div id="bar-chart-frame" style="display: block;">
-                <iframe src="/plot?type=bar" class="w-full h-[600px] border-0"></iframe>
+                    <iframe src="/plot?type=bar" class="w-full h-[600px] border-0"></iframe>
                 </div>
                 <div id="gantt-chart-frame" style="display: none;">
-                <iframe src="/plot?type=gantt" class="w-full h-[600px] border-0"></iframe>
+                    <iframe src="/plot?type=gantt" class="w-full h-[600px] border-0"></iframe>
                 </div>
 
                 <script>
                 function showPlot(type) {
-                document.getElementById('bar-chart-frame').style.display = type === 'bar' ? 'block' : 'none';
-                document.getElementById('gantt-chart-frame').style.display = type === 'gantt' ? 'block' : 'none';
+                    document.getElementById('bar-chart-frame').style.display = type === 'bar' ? 'block' : 'none';
+                    document.getElementById('gantt-chart-frame').style.display = type === 'gantt' ? 'block' : 'none';
                 }
                 </script>
             </div>

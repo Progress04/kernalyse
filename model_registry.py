@@ -10,5 +10,9 @@ MODEL_REGISTRY = {
     "vector_add": {
         "type": "binary",
         "path": "examples/vector_add"
+    },
+    "vector_mult": {
+        "type": "binary",
+        "path": "examples/vector_mult"
     }
 }

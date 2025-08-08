@@ -2,6 +2,10 @@ from flask import Flask, request, render_template
 import subprocess
 import os
 import logging
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from model_registry import MODEL_REGISTRY
 
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
@@ -13,38 +17,63 @@ CONTAINER_WORKDIR = "/workspace"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    selected_model = None
+    user_input = ""
+    error = None
+
     if request.method == "POST":
-        user_input = request.form.get("user_input", "Hello BERT")
+        selected_model = request.form.get("model_choice")
+        user_input = request.form.get("user_input", "")
 
-        container_cmd = [
-            "docker", "run", "--rm",
-            "--runtime=nvidia",
-            "-v", f"{PROJECT_VOLUME}:{CONTAINER_WORKDIR}",
-            "-w", CONTAINER_WORKDIR,
-            "kernalyse-nsys",
-            "bash", "-c",
-            f"python3 -m interface.cli.main profile "
-            f"--prompt \"{user_input}\" "
-            f"--model examples/bert/model.onnx "
-            f"--trace-output data/profile"
-        ]
+        model_config = MODEL_REGISTRY.get(selected_model)
+        if not model_config:
+            return "<h3>❌ Invalid model selected</h3>"
 
-        print("Running Docker command:")
-        print(" ".join(container_cmd))
+        trace_output = "data/profile"
+        if model_config["type"] == "onnx":
+            if not user_input.strip():
+                return "<h3>❌ Prompt is required for ONNX models</h3>"
+            container_cmd = [
+                "docker", "run", "--rm",
+                "--runtime=nvidia",
+                "-v", f"{PROJECT_VOLUME}:{CONTAINER_WORKDIR}",
+                "-w", CONTAINER_WORKDIR,
+                "kernalyse-nsys",
+                "bash", "-c",
+                f"python3 -m interface.cli.main profile "
+                f"--prompt \"{user_input}\" "
+                f"--model {model_config['model_path']} "
+                f"--trace-output {trace_output}"
+            ]
+        elif model_config["type"] == "binary":
+            container_cmd = [
+                "docker", "run", "--rm",
+                "--runtime=nvidia",
+                "-v", f"{PROJECT_VOLUME}:{CONTAINER_WORKDIR}",
+                "-w", CONTAINER_WORKDIR,
+                "kernalyse-nsys",
+                "bash", "-c",
+                f"python3 -m interface.cli.main profile "
+                f"--binary {model_config['path']} "
+                f"--trace-output {trace_output}"
+            ]
+        else:
+            return "<h3>❌ Unknown model type</h3>"
 
         try:
             result = subprocess.run(container_cmd, check=True, capture_output=True, text=True)
-            print("---- STDOUT ----")
-            print(result.stdout)
-            print("---- STDERR ----")
-            print(result.stderr)
+            print("---- STDOUT ----\n", result.stdout)
+            print("---- STDERR ----\n", result.stderr)
         except subprocess.CalledProcessError as e:
-            return f"<h3>🚨 Error during profiling</h3><pre>{e}</pre>"
+            return f"<h3>🚨 Error during profiling</h3><pre>{e.stderr}</pre>"
 
-        if not os.path.exists(PLOT_PATH):
-            return "<h3>❌ No plot was generated</h3>"
-
-    return render_template("index.html", plot_exists=os.path.exists(PLOT_PATH))
+    return render_template(
+        "index.html",
+        model_registry=MODEL_REGISTRY,
+        selected_model=selected_model,
+        user_input=user_input,
+        plot_exists=os.path.exists(PLOT_PATH)
+    )
 
 @app.route("/plot")
 def show_plot():
